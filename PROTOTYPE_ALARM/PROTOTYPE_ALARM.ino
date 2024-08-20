@@ -48,6 +48,30 @@ void loop() {
     danger = false;
   }
 
+  // DETECTING DANGER AND UPDATING FLAG STATES IF NEEDED
+  detectDanger();
+  
+  // ACTIVATING SPEAKER VIA PHOTORESISTOR
+  activateBuzzer();
+
+  // DISPLAYING VALUES ON CONSOLE
+  Serial.println("photoresistor value: ");
+  Serial.println(PHOTORESISTOR_VALUE);
+  Serial.println("MIC value: ");
+  Serial.println(MIC_VALUE);
+  delay(500);
+}
+
+
+// FUNCTION UPDATING STATE FLAG (ACTIVATE)
+bool updateFlagActivate(){
+   Serial.println("TOGGLE!!!!!!!!! ");
+   alarmOn = !alarmOn;
+   return alarmOn;
+}
+
+// DETECTS IF THE LASER CONTACT WAS INTERCEPTED ALSO IF THE MIC DETECTED ANY NOISE
+void detectDanger(){
   // UPDATING STATE FLAG (DANGER)
   if(alarmOn){
     if( PHOTORESISTOR_VALUE < 945 || MIC_VALUE > 550){
@@ -56,8 +80,10 @@ void loop() {
       danger = false;
     }
   }
-  
-  // ACTIVATING SPEAKER VIA PHOTORESISTOR
+}
+
+// IF THE DANGER STATE IS TRUE, THEN THE BUZZER IS ACTIVATED
+void activateBuzzer(){
   if(danger == true){
     // buzzer activated
     tone(BUZZER, 330);
@@ -69,18 +95,6 @@ void loop() {
     // deactivating buzzer
     noTone(BUZZER);
   }
-
-  // DISPLAYING VALUES ON CONSOLE
-  Serial.println("photoresistor value: ");
-  Serial.println(PHOTORESISTOR_VALUE);
-  Serial.println("MIC value: ");
-  Serial.println(MIC_VALUE);
-  delay(500);
 }
 
-// FUNCTION UPDATING STATE FLAG (ACTIVATE)
-bool updateFlagActivate(){
-   Serial.println("TOGGLE!!!!!!!!! ");
-   alarmOn = !alarmOn;
-   return alarmOn;
-}
+
