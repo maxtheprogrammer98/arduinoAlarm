@@ -65,7 +65,7 @@ bool updateFlagActivate(){
 void detectDanger(){
   // UPDATING STATE FLAG (DANGER)
   if(alarmOn){
-    if( PHOTORESISTOR_VALUE < 945 || MIC_VALUE > 550){
+    if( PHOTORESISTOR_VALUE < 920 || MIC_VALUE > 550){
       danger = true;
     } else {
       danger = false;
