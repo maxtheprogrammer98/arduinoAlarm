@@ -4,7 +4,7 @@ const int MIC = A1;
 const int BUZZER = 2;
 const int BUTTON = 3;
 const int LED_ON = 4;
-const int LED_DANGER = 7;
+const int LED_DANGER = 5;
 
 // VALUES FROM SENSORS
 int PHOTORESISTOR_VALUE; 
@@ -40,13 +40,8 @@ void loop() {
     alarmOn = updateFlagActivate();
   }
 
-  // TURNING ON LED
-  if(alarmOn == true){
-    digitalWrite(LED_ON,HIGH);
-  } else {
-    digitalWrite(LED_ON, LOW);
-    danger = false;
-  }
+  // TURNING ON LED ON
+  activateLedOn();
 
   // DETECTING DANGER AND UPDATING FLAG STATES IF NEEDED
   detectDanger();
@@ -55,11 +50,7 @@ void loop() {
   activateBuzzer();
 
   // DISPLAYING VALUES ON CONSOLE
-  Serial.println("photoresistor value: ");
-  Serial.println(PHOTORESISTOR_VALUE);
-  Serial.println("MIC value: ");
-  Serial.println(MIC_VALUE);
-  delay(500);
+  displayStatesOnConsole();
 }
 
 
@@ -94,7 +85,29 @@ void activateBuzzer(){
   } else {
     // deactivating buzzer
     noTone(BUZZER);
+    // TURNING LED OFF
+    digitalWrite(LED_DANGER, LOW);
   }
+}
+
+// TURNS ON A LED WHEN THE DEVICE IS ACTIVATED
+void activateLedOn(){
+  if(alarmOn == true){
+    digitalWrite(LED_ON,HIGH);
+  } else {
+    danger = false;
+    digitalWrite(LED_ON, LOW);
+    digitalWrite(LED_DANGER, LOW);
+  }
+}
+
+// DISPLAYS STATES VALUE ON CONSOLE
+void displayStatesOnConsole(){
+  Serial.println("photoresistor value: ");
+  Serial.println(PHOTORESISTOR_VALUE);
+  Serial.println("MIC value: ");
+  Serial.println(MIC_VALUE);
+  delay(500);
 }
 
 
