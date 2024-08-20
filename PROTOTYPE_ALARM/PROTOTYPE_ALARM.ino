@@ -28,16 +28,20 @@ void setup() {
 
 void loop() {
 
-  // READING VALUES FROM ANALOGIC SENSORS
-  PHOTORESISTOR_VALUE = analogRead(PHOTORESISTOR);
-  MIC_VALUE = analogRead(MIC);
 
   // READING VALUES FROM DIGITAL SENSORS
   int buttonState = digitalRead(BUTTON);
 
   // UPDATING STATE WHEN BUTTON IS PRESSED
   if(buttonState == HIGH){
+    // ACTIVATING ALARM
     alarmOn = updateFlagActivate();
+  }
+
+  // READING VALUES FROM ANALOGIC SENSORS (only when alarm is on)
+  if(alarmOn){
+    PHOTORESISTOR_VALUE = analogRead(PHOTORESISTOR);
+    MIC_VALUE = analogRead(MIC);
   }
 
   // TURNING ON LED ON
@@ -65,7 +69,7 @@ bool updateFlagActivate(){
 void detectDanger(){
   // UPDATING STATE FLAG (DANGER)
   if(alarmOn){
-    if( PHOTORESISTOR_VALUE < 920 || MIC_VALUE > 550){
+    if( PHOTORESISTOR_VALUE < 800 || MIC_VALUE > 550){
       danger = true;
     } else {
       danger = false;
