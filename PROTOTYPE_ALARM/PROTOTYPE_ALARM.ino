@@ -1,6 +1,6 @@
 // VARIABLES
 const int PHOTORESISTOR = A0;
-//const int MIC = A1;
+const int MIC = A1;
 const int BUZZER = 2;
 const int BUTTON = 3;
 const int LED_ON = 4;
@@ -8,7 +8,7 @@ const int LED_DANGER = 5;
 
 // VALUES FROM SENSORS
 int PHOTORESISTOR_VALUE; 
-//int MIC_VALUE;
+int MIC_VALUE;
 
 // FLAGS
 bool danger = false;
@@ -18,7 +18,7 @@ void setup() {
   // INPUT
   pinMode(PHOTORESISTOR, INPUT);
   pinMode(BUTTON, INPUT);
-  //pinMode(MIC, INPUT);
+  pinMode(MIC, INPUT);
   // OUTPUTS
   pinMode(LED_ON, OUTPUT);
   pinMode(BUZZER, OUTPUT);
@@ -39,24 +39,19 @@ void loop() {
   
   // READING VALUES FROM ANALOGIC SENSORS (only when alarm is on)
   PHOTORESISTOR_VALUE = analogRead(PHOTORESISTOR);
-  //MIC_VALUE = analogRead(MIC);
+  MIC_VALUE = analogRead(MIC);
 
-  // EXECUTING FUNCTIONS IF ALARM IS ON
-  if(alarmOn){
-    
-    // TURNING ON LED ON
-    activateLedOn();
+  // TURNING ON LED ON
+  activateLedOn();
 
-    // DETECTING DANGER AND UPDATING FLAG STATES IF NEEDED
-    detectDanger();
+  // DETECTING DANGER AND UPDATING FLAG STATES IF NEEDED
+  detectDanger();
 
-    // ACTIVATING SPEAKER VIA PHOTORESISTOR
-    activateBuzzer();
+  // ACTIVATING SPEAKER VIA PHOTORESISTOR
+  activateBuzzer();
 
-    // DISPLAYING VALUES ON CONSOLE
-    displayStatesOnConsole();
-  }
-
+  // DISPLAYING VALUES ON CONSOLE
+  displayStatesOnConsole();
   
 }
 
@@ -72,7 +67,7 @@ bool updateFlagActivate(){
 void detectDanger(){
   // UPDATING STATE FLAG (DANGER)
   if(alarmOn){
-    if( PHOTORESISTOR_VALUE < 800){
+    if( PHOTORESISTOR_VALUE < 800  || MIC_VALUE > 540){
       danger = true;
       Serial.println("Danger detected!");
     } else {
@@ -86,7 +81,7 @@ void detectDanger(){
 void activateBuzzer(){
   if(danger == true){
     // buzzer activated
-    tone(BUZZER, 90);
+    tone(BUZZER, 1200);
     // led activated
     digitalWrite(LED_DANGER, HIGH);
     // displaying message on console
@@ -114,8 +109,8 @@ void activateLedOn(){
 void displayStatesOnConsole(){
   Serial.println("photoresistor value: ");
   Serial.println(PHOTORESISTOR_VALUE);
-  //Serial.println("MIC value: ");
-  //Serial.println(MIC_VALUE);
+  Serial.println("MIC value: ");
+  Serial.println(MIC_VALUE);
   Serial.println("DANGER STATE: ");
   Serial.println(danger);
   delay(500);
