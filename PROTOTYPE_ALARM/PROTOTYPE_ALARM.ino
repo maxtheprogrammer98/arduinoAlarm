@@ -4,7 +4,7 @@ const int MIC = A1;
 const int BUZZER = 2;
 const int BUTTON = 3;
 const int LED_ON = 4;
-const int LED_DANGER = 7;
+const int LED_DANGER = 5;
 
 // VALUES FROM SENSORS
 int PHOTORESISTOR_VALUE; 
@@ -28,55 +28,33 @@ void setup() {
 
 void loop() {
 
-  // READING VALUES FROM ANALOGIC SENSORS
-  PHOTORESISTOR_VALUE = analogRead(PHOTORESISTOR);
-  MIC_VALUE = analogRead(MIC);
-
   // READING VALUES FROM DIGITAL SENSORS
   int buttonState = digitalRead(BUTTON);
 
   // UPDATING STATE WHEN BUTTON IS PRESSED
   if(buttonState == HIGH){
+    // ACTIVATING ALARM
     alarmOn = updateFlagActivate();
   }
-
-  // TURNING ON LED
-  if(alarmOn == true){
-    digitalWrite(LED_ON,HIGH);
-  } else {
-    digitalWrite(LED_ON, LOW);
-    danger = false;
-  }
-
-  // UPDATING STATE FLAG (DANGER)
-  if(alarmOn){
-    if( PHOTORESISTOR_VALUE < 945 || MIC_VALUE > 550){
-      danger = true;
-    } else {
-      danger = false;
-    }
-  }
   
+  // READING VALUES FROM ANALOGIC SENSORS (only when alarm is on)
+  PHOTORESISTOR_VALUE = analogRead(PHOTORESISTOR);
+  MIC_VALUE = analogRead(MIC);
+
+  // TURNING ON LED ON
+  activateLedOn();
+
+  // DETECTING DANGER AND UPDATING FLAG STATES IF NEEDED
+  detectDanger();
+
   // ACTIVATING SPEAKER VIA PHOTORESISTOR
-  if(danger == true){
-    // buzzer activated
-    tone(BUZZER, 330);
-    // led activated
-    digitalWrite(LED_DANGER, HIGH);
-    // displaying message on console
-    Serial.println("hay intrusos!");
-  } else {
-    // deactivating buzzer
-    noTone(BUZZER);
-  }
+  activateBuzzer();
 
   // DISPLAYING VALUES ON CONSOLE
-  Serial.println("photoresistor value: ");
-  Serial.println(PHOTORESISTOR_VALUE);
-  Serial.println("MIC value: ");
-  Serial.println(MIC_VALUE);
-  delay(500);
+  displayStatesOnConsole();
+  
 }
+
 
 // FUNCTION UPDATING STATE FLAG (ACTIVATE)
 bool updateFlagActivate(){
@@ -84,3 +62,58 @@ bool updateFlagActivate(){
    alarmOn = !alarmOn;
    return alarmOn;
 }
+
+// DETECTS IF THE LASER CONTACT WAS INTERCEPTED ALSO IF THE MIC DETECTED ANY NOISE
+void detectDanger(){
+  // UPDATING STATE FLAG (DANGER)
+  if(alarmOn){
+    if( PHOTORESISTOR_VALUE < 800  || MIC_VALUE > 540){
+      danger = true;
+      Serial.println("Danger detected!");
+    } else {
+      danger = false;
+      Serial.println("Danger NOT detected!");
+    }
+  }
+}
+
+// IF THE DANGER STATE IS TRUE, THEN THE BUZZER IS ACTIVATED
+void activateBuzzer(){
+  if(danger == true){
+    // buzzer activated
+    tone(BUZZER, 1200);
+    // led activated
+    digitalWrite(LED_DANGER, HIGH);
+    // displaying message on console
+    Serial.println("hay intrusos!");
+  } else {
+    // deactivating buzzer
+    noTone(BUZZER);
+    // TURNING LED OFF
+    digitalWrite(LED_DANGER, LOW);
+  }
+}
+
+// TURNS ON A LED WHEN THE DEVICE IS ACTIVATED
+void activateLedOn(){
+  if(alarmOn == true){
+    digitalWrite(LED_ON,HIGH);
+  } else {
+    danger = false;
+    digitalWrite(LED_ON, LOW);
+    digitalWrite(LED_DANGER, LOW);
+  }
+}
+
+// DISPLAYS STATES VALUE ON CONSOLE
+void displayStatesOnConsole(){
+  Serial.println("photoresistor value: ");
+  Serial.println(PHOTORESISTOR_VALUE);
+  Serial.println("MIC value: ");
+  Serial.println(MIC_VALUE);
+  Serial.println("DANGER STATE: ");
+  Serial.println(danger);
+  delay(500);
+}
+
+
